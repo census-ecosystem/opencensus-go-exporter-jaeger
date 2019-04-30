@@ -20,7 +20,8 @@ import (
 	"testing"
 	"time"
 
-	gen "contrib.go.opencensus.io/exporter/jaeger/internal/gen-go/jaeger"
+	"github.com/uber/jaeger-client-go/thrift-gen/jaeger"
+
 	"go.opencensus.io/trace"
 	"sort"
 )
@@ -70,7 +71,7 @@ func Test_spanDataToThrift(t *testing.T) {
 	tests := []struct {
 		name string
 		data *trace.SpanData
-		want *gen.Span
+		want *jaeger.Span
 	}{
 		{
 			name: "no parent",
@@ -104,28 +105,28 @@ func Test_spanDataToThrift(t *testing.T) {
 				},
 				Status: trace.Status{Code: trace.StatusCodeUnknown, Message: "error"},
 			},
-			want: &gen.Span{
+			want: &jaeger.Span{
 				TraceIdLow:    651345242494996240,
 				TraceIdHigh:   72623859790382856,
 				SpanId:        72623859790382856,
 				OperationName: "/foo",
 				StartTime:     now.UnixNano() / 1000,
 				Duration:      0,
-				Tags: []*gen.Tag{
-					{Key: "double", VType: gen.TagType_DOUBLE, VDouble: &doubleValue},
-					{Key: "key", VType: gen.TagType_STRING, VStr: &keyValue},
-					{Key: "error", VType: gen.TagType_BOOL, VBool: &boolTrue},
-					{Key: "status.code", VType: gen.TagType_LONG, VLong: &statusCodeValue},
-					{Key: "status.message", VType: gen.TagType_STRING, VStr: &statusMessage},
+				Tags: []*jaeger.Tag{
+					{Key: "double", VType: jaeger.TagType_DOUBLE, VDouble: &doubleValue},
+					{Key: "key", VType: jaeger.TagType_STRING, VStr: &keyValue},
+					{Key: "error", VType: jaeger.TagType_BOOL, VBool: &boolTrue},
+					{Key: "status.code", VType: jaeger.TagType_LONG, VLong: &statusCodeValue},
+					{Key: "status.message", VType: jaeger.TagType_STRING, VStr: &statusMessage},
 				},
-				Logs: []*gen.Log{
-					{Timestamp: now.UnixNano() / 1000, Fields: []*gen.Tag{
-						{Key: "answer", VType: gen.TagType_LONG, VLong: &answerValue},
-						{Key: "message", VType: gen.TagType_STRING, VStr: &statusMessage},
+				Logs: []*jaeger.Log{
+					{Timestamp: now.UnixNano() / 1000, Fields: []*jaeger.Tag{
+						{Key: "answer", VType: jaeger.TagType_LONG, VLong: &answerValue},
+						{Key: "message", VType: jaeger.TagType_STRING, VStr: &statusMessage},
 					}},
-					{Timestamp: now.UnixNano() / 1000, Fields: []*gen.Tag{
-						{Key: "result", VType: gen.TagType_BOOL, VBool: &resultValue},
-						{Key: "message", VType: gen.TagType_STRING, VStr: &statusMessage},
+					{Timestamp: now.UnixNano() / 1000, Fields: []*jaeger.Tag{
+						{Key: "result", VType: jaeger.TagType_BOOL, VBool: &resultValue},
+						{Key: "message", VType: jaeger.TagType_STRING, VStr: &statusMessage},
 					}},
 				},
 			},
