@@ -30,6 +30,7 @@ const udpPacketMaxLength = 65000
 
 // agentClientUDP is a UDP client to Jaeger agent that implements gen.Agent interface.
 type agentClientUDP struct {
+	agent.Agent
 	io.Closer
 
 	connUDP       *net.UDPConn
