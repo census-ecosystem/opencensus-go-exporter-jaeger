@@ -51,14 +51,14 @@ func (f *HTTPFormat) SpanContextFromRequest(req *http.Request) (sc trace.SpanCon
 		return trace.SpanContext{}, false
 	}
 
-	traceId, err := hex.DecodeString(traceHeaderParts[0])
+	traceID, err := hex.DecodeString(traceHeaderParts[0])
 	if err != nil {
 		return trace.SpanContext{}, false
 	}
-	if len(traceId) == 8 {
-		copy(sc.TraceID[8:16], traceId)
+	if len(traceID) == 8 {
+		copy(sc.TraceID[8:16], traceID)
 	} else {
-		copy(sc.TraceID[:], traceId)
+		copy(sc.TraceID[:], traceID)
 	}
 
 	spanID, err := hex.DecodeString(traceHeaderParts[1])
