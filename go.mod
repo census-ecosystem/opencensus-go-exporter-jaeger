@@ -1,4 +1,4 @@
-module contrib.go.opencensus.io/exporter/jaeger
+module github.com/Nighthawk22/opencensus-go-exporter-jaeger
 
 require (
 	github.com/uber/jaeger-client-go v2.15.0+incompatible
