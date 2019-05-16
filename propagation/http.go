@@ -1,4 +1,4 @@
-// Copyright 2018, OpenCensus Authors
+// Copyright 2019, OpenCensus Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,20 +28,21 @@ import (
 )
 
 const (
-	httpHeader = `uber-trace-id`
+	httpHeader   = `uber-trace-id`
+	maxLenHeader = 200
 )
 
 var _ propagation.HTTPFormat = (*HTTPFormat)(nil)
 
 // HTTPFormat implements propagation.HTTPFormat to propagate
-// traces in HTTP headers for Google Cloud Platform and Stackdriver Trace.
+// traces in HTTP headers for Jaeger traces.
 type HTTPFormat struct{}
 
-// SpanContextFromRequest extracts a Stackdriver Trace span context from incoming requests.
+// SpanContextFromRequest extracts a Jaeger Trace span context from incoming requests.
 func (f *HTTPFormat) SpanContextFromRequest(req *http.Request) (sc trace.SpanContext, ok bool) {
 	h := req.Header.Get(httpHeader)
 
-	if h == "" {
+	if h == "" || len(h) > maxLenHeader {
 		return trace.SpanContext{}, false
 	}
 
@@ -81,9 +82,9 @@ func (f *HTTPFormat) SpanContextFromRequest(req *http.Request) (sc trace.SpanCon
 // SpanContextToRequest modifies the given request to include a Jaeger Trace header.
 func (f *HTTPFormat) SpanContextToRequest(sc trace.SpanContext, req *http.Request) {
 	header := fmt.Sprintf("%s:%s:%s:%d",
-		strings.Replace(sc.TraceID.String(), "0000000000000000", "", 1), //Replacing 0 os if string is 8bit
+		strings.Replace(sc.TraceID.String(), "0000000000000000", "", 1), //Replacing 0 if string is 8bit
 		sc.SpanID.String(),
-		"0", //Parent span deprecated and will therefore be ignored.
+		"", //Parent span deprecated and will therefore be ignored.
 		int64(sc.TraceOptions))
 	req.Header.Set(httpHeader, header)
 }

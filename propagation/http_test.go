@@ -1,4 +1,4 @@
-// Copyright 2018, OpenCensus Authors
+// Copyright 2019, OpenCensus Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import (
 func TestHTTPFormat(t *testing.T) {
 	format := &HTTPFormat{}
 	traceID := [16]byte{0, 0, 0, 0, 0, 0, 0, 0, 66, 179, 103, 245, 105, 105, 242, 156}
+	traceID2 := [16]byte{66, 179, 103, 245, 105, 105, 242, 156, 66, 179, 103, 245, 105, 105, 242, 156}
 	spanID1 := [8]byte{104, 185, 184, 89, 243, 185, 19, 51}
 	spanID2 := [8]byte{67, 211, 230, 84, 180, 39, 182, 139}
 	tests := []struct {
@@ -32,7 +33,7 @@ func TestHTTPFormat(t *testing.T) {
 		wantSpanContext trace.SpanContext
 	}{
 		{
-			incoming: "42b367f56969f29c:68b9b859f3b91333:0:1",
+			incoming: "42b367f56969f29c:68b9b859f3b91333::1",
 			wantSpanContext: trace.SpanContext{
 				TraceID:      traceID,
 				SpanID:       spanID1,
@@ -40,9 +41,17 @@ func TestHTTPFormat(t *testing.T) {
 			},
 		},
 		{
-			incoming: "42b367f56969f29c:43d3e654b427b68b:0:0",
+			incoming: "42b367f56969f29c:43d3e654b427b68b::0",
 			wantSpanContext: trace.SpanContext{
 				TraceID:      traceID,
+				SpanID:       spanID2,
+				TraceOptions: 0,
+			},
+		},
+		{
+			incoming: "42b367f56969f29c42b367f56969f29c:43d3e654b427b68b::0",
+			wantSpanContext: trace.SpanContext{
+				TraceID:      traceID2,
 				SpanID:       spanID2,
 				TraceOptions: 0,
 			},
