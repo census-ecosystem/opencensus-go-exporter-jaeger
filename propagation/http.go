@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -28,7 +29,7 @@ import (
 )
 
 const (
-	httpHeader   = `uber-trace-id`
+	httpHeader   = `Uber-Trace-Id`
 	maxLenHeader = 200
 )
 
@@ -46,9 +47,14 @@ func (f *HTTPFormat) SpanContextFromRequest(req *http.Request) (sc trace.SpanCon
 		return trace.SpanContext{}, false
 	}
 
+	h, err := url.QueryUnescape(h)
+	if err != nil {
+		return trace.SpanContext{}, false
+	}
+
 	// Parse the trace id field.
 	traceHeaderParts := strings.Split(h, `:`)
-	if len(traceHeaderParts) != 4 {
+	if len(traceHeaderParts) != 4 && len(traceHeaderParts) != 3 {
 		return trace.SpanContext{}, false
 	}
 
@@ -68,7 +74,7 @@ func (f *HTTPFormat) SpanContextFromRequest(req *http.Request) (sc trace.SpanCon
 	}
 	copy(sc.SpanID[:], spanID)
 
-	opt, err := strconv.Atoi(traceHeaderParts[3])
+	opt, err := strconv.Atoi(traceHeaderParts[len(traceHeaderParts)-1])
 
 	if err != nil {
 		return trace.SpanContext{}, false

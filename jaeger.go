@@ -189,8 +189,9 @@ var _ trace.Exporter = (*Exporter)(nil)
 
 // ExportSpan exports a SpanData to Jaeger.
 func (e *Exporter) ExportSpan(data *trace.SpanData) {
-	e.bundler.Add(spanDataToThrift(data), 1)
-	// TODO(jbd): Handle oversized bundlers.
+	if data.IsSampled() {
+		e.bundler.Add(spanDataToThrift(data), 1)
+	}
 }
 
 // As per the OpenCensus Status code mapping in
