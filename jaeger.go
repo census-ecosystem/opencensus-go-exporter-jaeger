@@ -241,6 +241,9 @@ func spanDataToThrift(data *trace.SpanData) *jaeger.Span {
 			SpanId:      bytesToInt64(link.SpanID[:]),
 		})
 	}
+	for _, me := range data.MessageEvents {
+		logs = append(logs, timedMessageEventToLog(me))
+	}
 	return &jaeger.Span{
 		TraceIdHigh:   bytesToInt64(data.TraceID[0:8]),
 		TraceIdLow:    bytesToInt64(data.TraceID[8:16]),
@@ -304,6 +307,47 @@ func attributeToTag(key string, a interface{}) *jaeger.Tag {
 		}
 	}
 	return tag
+}
+
+func timedMessageEventToLog(evt trace.MessageEvent) *jaeger.Log {
+	id := evt.MessageID
+	cSize := evt.CompressedByteSize
+	ucSize := evt.UncompressedByteSize
+	var description string
+	if evt.EventType == trace.MessageEventTypeRecv {
+		description = "received message"
+	} else if evt.EventType == trace.MessageEventTypeSent {
+		description = "sent message"
+	} else {
+		description = "unknown message event type"
+	}
+	fields := []*jaeger.Tag{
+		&jaeger.Tag{
+			Key:   "id",
+			VLong: &id,
+			VType: jaeger.TagType_LONG,
+		},
+		&jaeger.Tag{
+			Key:   "compressed_size",
+			VLong: &cSize,
+			VType: jaeger.TagType_LONG,
+		},
+		&jaeger.Tag{
+			Key:   "uncompressed_size",
+			VLong: &ucSize,
+			VType: jaeger.TagType_LONG,
+		},
+		&jaeger.Tag{
+			Key:   "message",
+			VStr:  &description,
+			VType: jaeger.TagType_STRING,
+		},
+	}
+
+	return &jaeger.Log{
+		Timestamp: evt.Time.UnixNano() / 1000,
+		Fields:    fields,
+	}
 }
 
 // Flush waits for exported trace spans to be uploaded.
