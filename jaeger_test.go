@@ -16,14 +16,13 @@ package jaeger
 
 import (
 	"fmt"
-	"reflect"
+	"sort"
 	"testing"
 	"time"
 
 	"github.com/uber/jaeger-client-go/thrift-gen/jaeger"
 
 	"go.opencensus.io/trace"
-	"sort"
 )
 
 // TODO(jbd): Test export.
@@ -129,6 +128,7 @@ func Test_spanDataToThrift(t *testing.T) {
 						{Key: "message", VType: jaeger.TagType_STRING, VStr: &statusMessage},
 					}},
 				},
+				References: []*jaeger.SpanRef{},
 			},
 		},
 	}
@@ -141,7 +141,15 @@ func Test_spanDataToThrift(t *testing.T) {
 			sort.Slice(tt.want.Tags, func(i, j int) bool {
 				return tt.want.Tags[i].Key < tt.want.Tags[j].Key
 			})
-			if !reflect.DeepEqual(got, tt.want) {
+			gotBuf, err := serialize(got)
+			if err != nil {
+				t.Fatalf("failed to serialize: %v", err)
+			}
+			wantBuf, err := serialize(tt.want)
+			if err != nil {
+				t.Fatalf("failed to serialize: %v", err)
+			}
+			if gotBuf.String() != wantBuf.String() {
 				t.Errorf("spanDataToThrift()\nGot:\n%v\nWant;\n%v", got, tt.want)
 			}
 		})

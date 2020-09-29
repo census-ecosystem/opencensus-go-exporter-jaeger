@@ -218,7 +218,7 @@ func spanDataToThrift(data *trace.SpanData) *jaeger.Span {
 		tags = append(tags, attributeToTag("error", true))
 	}
 
-	var logs []*jaeger.Log
+	logs := make([]*jaeger.Log, 0, len(data.Annotations))
 	for _, a := range data.Annotations {
 		fields := make([]*jaeger.Tag, 0, len(a.Attributes))
 		for k, v := range a.Attributes {
@@ -233,7 +233,7 @@ func spanDataToThrift(data *trace.SpanData) *jaeger.Span {
 			Fields:    fields,
 		})
 	}
-	var refs []*jaeger.SpanRef
+	refs := make([]*jaeger.SpanRef, 0, len(data.Links))
 	for _, link := range data.Links {
 		refs = append(refs, &jaeger.SpanRef{
 			TraceIdHigh: bytesToInt64(link.TraceID[0:8]),
