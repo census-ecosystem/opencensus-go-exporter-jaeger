@@ -22,8 +22,9 @@ import (
 
 	"github.com/uber/jaeger-client-go/thrift-gen/jaeger"
 
-	"go.opencensus.io/trace"
 	"sort"
+
+	"go.opencensus.io/trace"
 )
 
 // TODO(jbd): Test export.
@@ -67,6 +68,10 @@ func Test_spanDataToThrift(t *testing.T) {
 	doubleValue := float64(123.456)
 	boolTrue := true
 	statusMessage := "error"
+	messageID := int64(1234)
+	uncompressedByteSize := int64(5000)
+	compressedByteSize := int64(4000)
+	eventMessage := "sent message"
 
 	tests := []struct {
 		name string
@@ -104,6 +109,15 @@ func Test_spanDataToThrift(t *testing.T) {
 					},
 				},
 				Status: trace.Status{Code: trace.StatusCodeUnknown, Message: "error"},
+				MessageEvents: []trace.MessageEvent{
+					{
+						Time:                 now,
+						EventType:            trace.MessageEventTypeSent,
+						MessageID:            messageID,
+						UncompressedByteSize: uncompressedByteSize,
+						CompressedByteSize:   compressedByteSize,
+					},
+				},
 			},
 			want: &jaeger.Span{
 				TraceIdLow:    651345242494996240,
@@ -127,6 +141,12 @@ func Test_spanDataToThrift(t *testing.T) {
 					{Timestamp: now.UnixNano() / 1000, Fields: []*jaeger.Tag{
 						{Key: "result", VType: jaeger.TagType_BOOL, VBool: &resultValue},
 						{Key: "message", VType: jaeger.TagType_STRING, VStr: &statusMessage},
+					}},
+					{Timestamp: now.UnixNano() / 1000, Fields: []*jaeger.Tag{
+						{Key: "id", VType: jaeger.TagType_LONG, VLong: &messageID},
+						{Key: "compressed_size", VType: jaeger.TagType_LONG, VLong: &compressedByteSize},
+						{Key: "uncompressed_size", VType: jaeger.TagType_LONG, VLong: &uncompressedByteSize},
+						{Key: "message", VType: jaeger.TagType_STRING, VStr: &eventMessage},
 					}},
 				},
 			},
