@@ -9,4 +9,4 @@ require (
 	google.golang.org/api v0.29.0
 )
 
-replace github.com/uber/jaeger-client-go v2.25.0+incompatible => github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518084659-137f03bd1bdc+incompatible
+replace github.com/uber/jaeger-client-go v2.25.0+incompatible => github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518142720-aa535d145c30+incompatible
