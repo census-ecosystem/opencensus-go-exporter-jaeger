@@ -81,6 +81,8 @@ github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518084659-137f03bd1bdc+incomp
 github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518084659-137f03bd1bdc+incompatible/go.mod h1:a1BsOo8aNmgc/DpijDKshDB+VDBSE8CelbMSeumF1h8=
 github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518142720-aa535d145c30+incompatible h1:JgCK1dY1x7ng1ESh6SzP9k59xASn0KTzwxepIiHfeu4=
 github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518142720-aa535d145c30+incompatible/go.mod h1:a1BsOo8aNmgc/DpijDKshDB+VDBSE8CelbMSeumF1h8=
+github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518145049-c75020212e9e+incompatible h1:3lininzxsFY3OzP8CAp2GG+jdhJcj0u+snv3Wg9fpmo=
+github.com/nhatthm/jaeger-client-go v2.28.1-0.20210518145049-c75020212e9e+incompatible/go.mod h1:a1BsOo8aNmgc/DpijDKshDB+VDBSE8CelbMSeumF1h8=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
