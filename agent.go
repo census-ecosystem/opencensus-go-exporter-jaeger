@@ -15,6 +15,7 @@
 package jaeger
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net"
@@ -73,8 +74,7 @@ func newAgentClientUDP(hostPort string, maxPacketSize int) (*agentClientUDP, err
 // EmitBatch implements EmitBatch() of Agent interface
 func (a *agentClientUDP) EmitBatch(batch *jaeger.Batch) error {
 	a.thriftBuffer.Reset()
-	a.client.SeqId = 0 // we have no need for distinct SeqIds for our one-way UDP messages
-	if err := a.client.EmitBatch(batch); err != nil {
+	if err := a.client.EmitBatch(context.Background(), batch); err != nil {
 		return err
 	}
 	if a.thriftBuffer.Len() > a.maxPacketSize {
