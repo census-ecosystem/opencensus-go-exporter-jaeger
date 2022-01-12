@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"context"
 
 	"github.com/uber/jaeger-client-go/thrift"
 	"github.com/uber/jaeger-client-go/thrift-gen/jaeger"
@@ -358,7 +359,7 @@ func (e *Exporter) uploadCollector(batch *jaeger.Batch) error {
 
 func serialize(obj thrift.TStruct) (*bytes.Buffer, error) {
 	buf := thrift.NewTMemoryBuffer()
-	if err := obj.Write(thrift.NewTBinaryProtocolTransport(buf)); err != nil {
+	if err := obj.Write(context.Background(),thrift.NewTBinaryProtocolTransport(buf)); err != nil {
 		return nil, err
 	}
 	return buf.Buffer, nil
