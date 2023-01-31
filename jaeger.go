@@ -17,6 +17,7 @@ package jaeger // import "contrib.go.opencensus.io/exporter/jaeger"
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -358,7 +359,7 @@ func (e *Exporter) uploadCollector(batch *jaeger.Batch) error {
 
 func serialize(obj thrift.TStruct) (*bytes.Buffer, error) {
 	buf := thrift.NewTMemoryBuffer()
-	if err := obj.Write(thrift.NewTBinaryProtocolTransport(buf)); err != nil {
+	if err := obj.Write(context.Background(), thrift.NewTBinaryProtocolConf(buf, nil)); err != nil {
 		return nil, err
 	}
 	return buf.Buffer, nil
