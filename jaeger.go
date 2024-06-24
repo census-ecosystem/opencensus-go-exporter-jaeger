@@ -17,6 +17,7 @@ package jaeger // import "contrib.go.opencensus.io/exporter/jaeger"
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -126,7 +127,8 @@ func NewExporter(o Options) (*Exporter, error) {
 		},
 	}
 	bundler := bundler.NewBundler((*jaeger.Span)(nil), func(bundle interface{}) {
-		if err := e.upload(bundle.([]*jaeger.Span)); err != nil {
+		ctx := context.TODO()
+		if err := e.upload(ctx, bundle.([]*jaeger.Span)); err != nil {
 			onError(err)
 		}
 	})
@@ -313,23 +315,23 @@ func (e *Exporter) Flush() {
 	e.bundler.Flush()
 }
 
-func (e *Exporter) upload(spans []*jaeger.Span) error {
+func (e *Exporter) upload(ctx context.Context, spans []*jaeger.Span) error {
 	batch := &jaeger.Batch{
 		Spans:   spans,
 		Process: e.process,
 	}
 	if e.endpoint != "" {
-		return e.uploadCollector(batch)
+		return e.uploadCollector(ctx, batch)
 	}
-	return e.uploadAgent(batch)
+	return e.uploadAgent(ctx, batch)
 }
 
-func (e *Exporter) uploadAgent(batch *jaeger.Batch) error {
-	return e.client.EmitBatch(batch)
+func (e *Exporter) uploadAgent(ctx context.Context, batch *jaeger.Batch) error {
+	return e.client.EmitBatch(ctx, batch)
 }
 
-func (e *Exporter) uploadCollector(batch *jaeger.Batch) error {
-	body, err := serialize(batch)
+func (e *Exporter) uploadCollector(ctx context.Context, batch *jaeger.Batch) error {
+	body, err := serialize(ctx, batch)
 	if err != nil {
 		return err
 	}
@@ -356,9 +358,9 @@ func (e *Exporter) uploadCollector(batch *jaeger.Batch) error {
 	return nil
 }
 
-func serialize(obj thrift.TStruct) (*bytes.Buffer, error) {
+func serialize(ctx context.Context, obj thrift.TStruct) (*bytes.Buffer, error) {
 	buf := thrift.NewTMemoryBuffer()
-	if err := obj.Write(thrift.NewTBinaryProtocolTransport(buf)); err != nil {
+	if err := obj.Write(ctx, thrift.NewTBinaryProtocolTransport(buf)); err != nil {
 		return nil, err
 	}
 	return buf.Buffer, nil
